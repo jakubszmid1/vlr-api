@@ -3,13 +3,12 @@ from bs4 import Tag
 from services.vlr_client import VlrClient
 from services.utils import cleanup_text, safe_int
 
-async def vlr_team_compositions(
-        client: VlrClient,
-        team_id: str,
-        event_id: str = "all",
-        from_date: str = None,
-        to_date: str = None
-) -> dict:
+
+async def vlr_team_compositions(client: VlrClient, 
+                                team_id: str, 
+                                event_id: str = "all", 
+                                from_date: str = None, 
+                                to_date: str = None) -> dict:
     url = f"{VLR_URL}/team/stats/{team_id}"
 
     params = {
@@ -36,12 +35,11 @@ async def vlr_team_compositions(
 
         if not map_name:
             map_name = cleanup_text(agent_divs[0]["data-map"])
-        
-        all_compositions_data = []
 
+        all_compositions_data = []
         for composition_div in agent_divs:
             compositions_data = {}
-            
+
             compositions_data["times_played"] = times_map_played_from_composition_div(composition_div)
             compositions_data["agents"] = agents_from_composition_div(composition_div)
             all_compositions_data.append(compositions_data)
@@ -49,6 +47,7 @@ async def vlr_team_compositions(
         map_stats = {
             "compositions": all_compositions_data
         }
+
         map_data[map_name] = map_stats
 
     data = {
@@ -59,8 +58,10 @@ async def vlr_team_compositions(
 
     return {"status": Status.OK, "compositions": data}
 
+
 def agent_name_from_img_src(img_src: str) -> str:
     return img_src.split("/")[-1].split(".")[0]
+
 
 def agents_from_composition_div(composition_div: Tag) -> list[str]:
     agents = []
@@ -69,11 +70,14 @@ def agents_from_composition_div(composition_div: Tag) -> list[str]:
         agents.append(agent_name)
     return agents
 
+
 def times_map_played_from_composition_div(composition_div: Tag) -> int:
     # Context is small.. there are 2 spans, one empty with no style "", one containing times played
-    is_inline = lambda style: style and all([s in style for s in ["inline", "display"]]) # <-- bruh
+    def is_inline(style): return style and all(
+        [s in style for s in ["inline", "display"]])  # <-- bruh
     times_played_span = composition_div.find("span", style=lambda s: is_inline(s)).text
     return safe_int(cleanup_text(times_played_span))
+
 
 def parse_team_compositions_from_map_row(map_row: Tag) -> Tag:
     tds = map_row.find_all("td")

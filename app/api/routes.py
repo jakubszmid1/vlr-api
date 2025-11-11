@@ -7,6 +7,7 @@ from schemas.teams import VLRTeamCompositionsResponse
 
 router = APIRouter(tags=["scraper"])
 
+
 @router.get("/team/compositions", response_model=VLRTeamCompositionsResponse)
 async def team_compositions(
     team_id: str = Query(..., description="VLR ID of the team to fetch data for"),
