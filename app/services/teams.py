@@ -4,10 +4,10 @@ from services.vlr_client import VlrClient
 from services.utils import cleanup_text, safe_int
 
 
-async def vlr_team_compositions(client: VlrClient, 
-                                team_id: str, 
-                                event_id: str = "all", 
-                                from_date: str = None, 
+async def vlr_team_compositions(client: VlrClient,
+                                team_id: str,
+                                event_id: str = "all",
+                                from_date: str = None,
                                 to_date: str = None) -> dict:
     url = f"{VLR_URL}/team/stats/{team_id}"
 
