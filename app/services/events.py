@@ -1,7 +1,8 @@
+from typing import Tuple
 from config.constants import VLR_URL, REGION_CODE_MAP, EVENT_TIER_CODE_MAP, Status, EventRegion, EventTier
 from bs4 import BeautifulSoup, ResultSet, Tag
 from services.vlr_client import VlrClient
-from services.utils import cleanup_text, safe_int, convert_date_format
+from services.utils import cleanup_text, safe_int, convert_date_range_format
 from datetime import datetime
 
 
@@ -56,20 +57,14 @@ def get_event_id_from_href(event_tag: Tag) -> str:
     except (IndexError, ValueError):
         return "N/A"
     
-def get_event_dates(event_tag: Tag):
-    # mod-dates
+def get_event_dates(event_tag: Tag) -> Tuple[str, str]:
     date_div = event_tag.select_one("div.mod-dates")
     # date is directly in the div, nested divs contain other data
     date_text = cleanup_text(date_div.contents[0].text) if date_div else "N/A"
 
-    if "—" in date_text:
-        date_start, date_end = date_text.split("—", 1)
-        current_year = datetime.now().year
-        date_start = convert_date_format(date_start.strip(), current_year)
-        date_end = convert_date_format(date_end.strip(), current_year)
-        return date_start, date_end
-    else:
-        return "N/A", "N/A"
+    current_year = datetime.now().year
+    date_start, date_end = convert_date_range_format(date_text, current_year)
+    return date_start, date_end
     
 def get_events_list(html: BeautifulSoup, completed: bool) -> ResultSet[Tag]:
     label_class = "mod-completed" if completed else "mod-upcoming"
