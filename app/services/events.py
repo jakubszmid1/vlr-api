@@ -8,7 +8,8 @@ from datetime import datetime
 async def vlr_get_events(
         client: VlrClient,
         completed: bool = True,
-        page: int = 1) -> dict:
+        page: int = 1,
+        event_name_filter: str = None) -> dict:
 
     url = f"{VLR_URL}/events"
     params = {
@@ -21,6 +22,10 @@ async def vlr_get_events(
         event_id = get_event_id_from_href(event_tag)
         date_start, date_end = get_event_dates(event_tag)
         event_name, prize_amount = get_inner_data_event(event_tag)
+
+        if event_name_filter and event_name_filter.lower() not in event_name:
+            continue
+
         events.append({
             "event_name": event_name,
             "date_start": date_start,
@@ -28,6 +33,7 @@ async def vlr_get_events(
             "prize_amount": prize_amount,
             "event_id": event_id,
         })
+
     return {"status": Status.OK, "events": events}
 
 def get_event_id_from_href(event_tag: Tag) -> str:
@@ -51,6 +57,7 @@ def get_event_dates(event_tag: Tag):
     date_div = event_tag.select_one("div.mod-dates")
     # date is directly in the div, nested divs contain other data
     date_text = cleanup_text(date_div.contents[0].text) if date_div else "N/A"
+    
     if "—" in date_text:
         date_start, date_end = date_text.split("—", 1)
         current_year = datetime.now().year
