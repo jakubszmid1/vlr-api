@@ -1,4 +1,4 @@
-from config.constants import VLR_URL, Status
+from config.constants import VLR_URL, REGION_CODE_MAP, EVENT_TIER_CODE_MAP, Status, EventRegion, EventTier
 from bs4 import BeautifulSoup, ResultSet, Tag
 from services.vlr_client import VlrClient
 from services.utils import cleanup_text, safe_int, convert_date_format
@@ -9,11 +9,15 @@ async def vlr_get_events(
         client: VlrClient,
         completed: bool = True,
         page: int = 1,
+        region: EventRegion = EventRegion.ALL,
+        event_tier: EventTier = EventTier.ALL,
         event_name_filter: str = None) -> dict:
 
     url = f"{VLR_URL}/events"
     params = {
         "page": page,
+        "region": REGION_CODE_MAP[region],
+        "tier": EVENT_TIER_CODE_MAP[event_tier]
     }
     html = await client.soupify(url, params=params)
     events_tag = get_events_list(html, completed)
@@ -34,7 +38,7 @@ async def vlr_get_events(
             "event_id": event_id,
         })
 
-    return {"status": Status.OK, "events": events}
+    return {"events": events}
 
 def get_event_id_from_href(event_tag: Tag) -> str:
     href = event_tag['href']
@@ -57,7 +61,7 @@ def get_event_dates(event_tag: Tag):
     date_div = event_tag.select_one("div.mod-dates")
     # date is directly in the div, nested divs contain other data
     date_text = cleanup_text(date_div.contents[0].text) if date_div else "N/A"
-    
+
     if "—" in date_text:
         date_start, date_end = date_text.split("—", 1)
         current_year = datetime.now().year
@@ -65,7 +69,7 @@ def get_event_dates(event_tag: Tag):
         date_end = convert_date_format(date_end.strip(), current_year)
         return date_start, date_end
     else:
-        return None, None
+        return "N/A", "N/A"
     
 def get_events_list(html: BeautifulSoup, completed: bool) -> ResultSet[Tag]:
     label_class = "mod-completed" if completed else "mod-upcoming"

@@ -20,7 +20,7 @@ def safe_int(value: str, default: int = 0) -> int:
         return default
     
 def convert_date_format(date_str: str, year: int) -> str:
-    """Convert date string from 'Jan 1' format to 'YYYY-MM-DD' format."""
+    """Convert date string from 'Jan 1-Feb 5' format to 'YYYY-MM-DD' format."""
     try:
         # Parse the date string with the year appended
         date_obj = datetime.strptime(f"{date_str} {year}", "%b %d %Y")
