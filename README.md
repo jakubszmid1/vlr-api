@@ -4,7 +4,7 @@
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/vlrapi.git
+git clone https://github.com/jakubszmid1/vlrapi.git
 cd vlrapi
 ```
 
