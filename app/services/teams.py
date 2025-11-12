@@ -44,6 +44,8 @@ async def vlr_team_compositions(client: VlrClient,
             compositions_data["agents"] = agents_from_composition_div(composition_div)
             all_compositions_data.append(compositions_data)
 
+        all_compositions_data.sort(key=lambda x: x["times_played"], reverse=True)
+
         map_stats = {
             "compositions": all_compositions_data
         }
