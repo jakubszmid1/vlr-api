@@ -7,6 +7,7 @@ from services.vlr_client import VlrClient
 
 from services.teams import vlr_team_compositions
 from services.events import vlr_get_events
+from services.rankings import vlr_get_rankings
 
 from schemas.teams import VLRTeamCompositionsResponse
 from schemas.events import VLREventsResponse
@@ -75,4 +76,17 @@ async def get_events(
         region=region,
         event_tier=event_tier,
         event_name_filter=event_name_filter
+    )
+
+@router.get("/rankings")
+async def get_rankings(
+    region: str = Query(
+        ...,
+        description="Region code for rankings"
+    ),
+    client: VlrClient = Depends(get_api_client),
+):
+    return await vlr_get_rankings(
+        client=client,
+        region=region
     )

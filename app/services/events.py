@@ -1,8 +1,8 @@
 from typing import Tuple
-from config.constants import VLR_URL, REGION_CODE_MAP, EVENT_TIER_CODE_MAP, Status, EventRegion, EventTier
+from config.constants import VLR_URL, REGION_CODE_MAP, EVENT_TIER_CODE_MAP, EventRegion, EventTier
 from bs4 import BeautifulSoup, ResultSet, Tag
 from services.vlr_client import VlrClient
-from services.utils import cleanup_text, safe_int, convert_date_range_format
+from services.utils import cleanup_text, convert_date_range_format
 from datetime import datetime
 
 

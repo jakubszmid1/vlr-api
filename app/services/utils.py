@@ -1,15 +1,16 @@
 from typing import Tuple
 import logging
 from datetime import datetime
+import re
 
-def cleanup_text(text: str) -> str:
-    return (text
+def cleanup_text(text: str, to_lower: bool = True) -> str:
+    text = (text
             .replace("\n", "")
             .replace("\t", "")
             .strip(" ")
             .strip("(")
-            .strip(")")
-            .lower())
+            .strip(")"))
+    return text.lower() if to_lower else text
 
 
 def safe_int(value: str, default: int = 0) -> int:
