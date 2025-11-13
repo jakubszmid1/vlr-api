@@ -1,5 +1,6 @@
+from typing import Tuple
 from config.constants import VLR_URL, Status
-from bs4 import Tag
+from bs4 import BeautifulSoup, Tag
 from services.vlr_client import VlrClient
 from services.utils import cleanup_text, safe_int
 
@@ -22,6 +23,7 @@ async def vlr_team_compositions(client: VlrClient,
     html = await client.soupify(url, params=params)
 
     table_body = html.select_one("table.wf-table.mod-team-maps > tbody")
+    team_name, team_code = get_team_name(html)
 
     map_data = {}
     # tr's without class are map rows, others contain metadata in HTML comments
@@ -54,7 +56,8 @@ async def vlr_team_compositions(client: VlrClient,
 
     data = {
         "team_id": team_id,
-        "team_name": "TODO",  # TODO: parse team name from page
+        "team_name": team_name,
+        "team_code": team_code,
         "maps": map_data
     }
 
@@ -85,3 +88,13 @@ def parse_team_compositions_from_map_row(map_row: Tag) -> Tag:
     tds = map_row.find_all("td")
     all_comps = tds[-1].find("div")
     return all_comps.find_all("div", class_="agent-comp-agg mod-first", recursive=False)
+
+def get_team_name(html: BeautifulSoup) -> Tuple[str, str]:
+    div = html.select_one("div.team-header")
+    team_name = div.select_one("h1.wf-title")
+    team_name_code = div.select_one("h2.wf-title.team-header-tag")
+
+    return (
+        cleanup_text(team_name.get_text(), to_lower=False),
+        cleanup_text(team_name_code.get_text(), to_lower=False)
+    )
