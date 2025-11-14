@@ -15,6 +15,7 @@ class MapStats(BaseModel):
 class TeamCompositions(BaseModel):
     team_id: str
     team_name: str
+    team_code: str
     maps: Dict[str, MapStats]
 
 
