@@ -8,6 +8,7 @@ from services.vlr_client import VlrClient
 from services.teams import vlr_team_compositions
 from services.events import vlr_get_events
 from services.rankings import vlr_get_rankings
+from services.matches import vlr_get_match
 
 from schemas.teams import VLRTeamCompositionsResponse
 from schemas.events import VLREventsResponse
@@ -89,4 +90,17 @@ async def get_rankings(
     return await vlr_get_rankings(
         client=client,
         region=region
+    )
+
+@router.get("/match")
+async def get_match(
+    match_id: str = Query(
+        ...,
+        description="The VLR match ID of this match"
+    ),
+    client: VlrClient = Depends(get_api_client)
+):
+    return await vlr_get_match(
+        client=client,
+        match_id=match_id
     )
