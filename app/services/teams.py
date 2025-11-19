@@ -2,7 +2,7 @@ from typing import Tuple
 from config.constants import VLR_URL, Status
 from bs4 import BeautifulSoup, Tag
 from services.vlr_client import VlrClient
-from services.utils import cleanup_text, safe_int
+from services.utils import cleanup_text, safe_int, agents_from_composition_div
 
 
 async def vlr_team_compositions(client: VlrClient,
@@ -62,18 +62,6 @@ async def vlr_team_compositions(client: VlrClient,
     }
 
     return {"status": Status.OK, "compositions": data}
-
-
-def agent_name_from_img_src(img_src: str) -> str:
-    return img_src.split("/")[-1].split(".")[0]
-
-
-def agents_from_composition_div(composition_div: Tag) -> list[str]:
-    agents = []
-    for agent_img in composition_div.find_all("img"):
-        agent_name = agent_name_from_img_src(agent_img["src"])
-        agents.append(agent_name)
-    return agents
 
 
 def times_map_played_from_composition_div(composition_div: Tag) -> int:

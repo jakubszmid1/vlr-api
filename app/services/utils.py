@@ -1,7 +1,7 @@
 from typing import Tuple
 import logging
 from datetime import datetime
-import re
+from bs4 import Tag
 
 def cleanup_text(text: str, to_lower: bool = True) -> str:
     text = (text
@@ -47,3 +47,14 @@ def convert_date_range_format(date_str: str, year: int) -> Tuple[str, str]:
     end_date = datetime.strptime(f"{end_str} {year}", "%b %d %Y")
         
     return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
+
+
+def agents_from_composition_div(composition_div: Tag) -> list[str]:
+    agents = []
+    for agent_img in composition_div.find_all("img"):
+        agent_name = agent_name_from_img_src(agent_img["src"])
+        agents.append(agent_name)
+    return agents
+
+def agent_name_from_img_src(img_src: str) -> str:
+    return img_src.split("/")[-1].split(".")[0]
